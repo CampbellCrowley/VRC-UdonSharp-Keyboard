@@ -156,6 +156,10 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'SpikeyRobot''s Keyboard: Version 1.4
 
+    https://github.com/CampbellCrowley/VRC-UdonSharp-Keyboard
+
+    https://git.io/JtUUU
+
 
     <color=yellow>Type </color><color=white>/clear</color><color=yellow> to clear
     your local chat log.</color>
