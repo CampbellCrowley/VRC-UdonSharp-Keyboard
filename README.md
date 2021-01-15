@@ -3,7 +3,7 @@ This is my attempt at a keyboard for VRChat in Udon.
 
 Feel free to use and give feedback!
 
-![Example Image of Keyboard in Unity](/Images/KeyboardExample.png)
+![Example Image of Keyboard in Unity](./Images/KeyboadExample1.png?raw=true)
 
 ## Requirements
 1) Requires VRChat SDK for Udon Worlds imported.
