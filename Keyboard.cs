@@ -11,11 +11,15 @@ public class Keyboard : UdonSharpBehaviour {
   public Toggle lShift;
   public Toggle rShift;
   public Toggle capsLock;
-  [Range(1, 1000)] public int maxLength = 300;
+  [Range(1, 1000)] public int maxLength = 80;
   [Range(1, 1000)] public int maxLines = 14;
+  [Range(0f, 1000f)] public float maxTypingDist = 5f;
 
   public Color pressedColor = Color.blue;
   public Color normalColor = Color.white;
+
+  public AudioSource clickSound;
+  public AudioSource messageSound;
 
   private string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[]{}\\|;:'\",<.>/? \t";
 
@@ -28,6 +32,7 @@ public class Keyboard : UdonSharpBehaviour {
 
   private VRCPlayerApi localPlayer;
   private string prefix = "@Unknown: ";
+  private string lastInput = "";
 
   // Use Upper-case.
   private bool shift = false;
@@ -50,6 +55,10 @@ public class Keyboard : UdonSharpBehaviour {
 
   // User pressed key.
   public void AppendChar(char c) {
+    if (localPlayer != null && Vector3.Distance(localPlayer.GetPosition(), transform.position) > maxTypingDist) {
+      inputField.DeactivateInputField();
+      return;
+    }
     inputField.text += c;
     lShift.isOn = false;
     rShift.isOn = false;
@@ -78,8 +87,16 @@ public class Keyboard : UdonSharpBehaviour {
   }
   // Live sanitize input text. (CustomEvent)
   public void InputUpdated() {
-    if (inputField.text.Length > maxLength) {
+    if (localPlayer != null && Vector3.Distance(localPlayer.GetPosition(), transform.position) > maxTypingDist) {
+      // Player too far to type, prevent typing accidentally.
+      if (inputField.text != lastInput) inputField.text = lastInput;
+      lastInput = inputField.text;
+    } else if (inputField.text.Length > maxLength) {
+      // Max line length exceeded, truncate end.
       inputField.text = inputField.text.Substring(0, maxLength);
+    } else {
+      // Normal case, character typed or deleted.
+      clickSound.PlayOneShot(clickSound.clip);
     }
   }
   // Shift or capslock was changed.
@@ -90,10 +107,15 @@ public class Keyboard : UdonSharpBehaviour {
     SetPressed(lShift, shift);
     SetPressed(rShift, shift);
     SetPressed(capsLock, capsLock.isOn);
+
+    clickSound.PlayOneShot(clickSound.clip);
   }
+  // Set a key as visibly pressed.
   private void SetPressed(Toggle t, bool set) {
     ColorBlock cb = t.colors;
     cb.normalColor = set ? pressedColor : normalColor;
+    cb.highlightedColor = set ? pressedColor : normalColor;
+    cb.pressedColor = set ? pressedColor : normalColor;
     t.colors = cb;
   }
   // Check for commands typed. False means no command was detected.
@@ -139,10 +161,9 @@ public class Keyboard : UdonSharpBehaviour {
     int seq = ParseSequenceNumber(delivery) + 1;
     // int seq = lastSeq + 1;
 
-    if (localPlayer != null) Networking.SetOwner(localPlayer, gameObject);
-
     string sanitized = SanitizeInput(inputField.text);
     if (sanitized.Length == 0) return;
+    if (localPlayer != null) Networking.SetOwner(localPlayer, gameObject);
     queuedMessage = prefix + sanitized;
     delivery = seq + queuedMessage;
     queuedSeq = seq;
@@ -159,6 +180,7 @@ public class Keyboard : UdonSharpBehaviour {
 
     int seq = ParseSequenceNumber(delivery);
     if (seq < lastSeq) return;
+    // if (seq == 0) return;
     // if (seq != lastSeq + 1) {
     //   AppendLine("<i><color=white>Desynced...</color></i>");
     // }
@@ -166,6 +188,7 @@ public class Keyboard : UdonSharpBehaviour {
 
     string newChatline = ParseMessage(delivery);
     AppendLine(newChatline);
+    messageSound.PlayOneShot(messageSound.clip);
 
     // Resend our message because we were too late.
     /* if (seq == queuedSeq && queuedMessage != newChatline) {
