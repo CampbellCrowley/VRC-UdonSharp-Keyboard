@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: Keyboard Udon C# Program Asset
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 406a53b7eec8baf49ae69e1b805a2664,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: edae316360c7dbf4687f3c8b1990f98c,
     type: 2}
   udonAssembly: 
   assemblyError: 
