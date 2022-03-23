@@ -10,5 +10,5 @@ Feel free to use and give feedback!
 2) Then requires [UdonSharp](https://github.com/vrchat-community/UdonSharp) imported.
 
 # License
-MIT Licence
+MIT Licence  
 Please provide credits such that others can find this project.
