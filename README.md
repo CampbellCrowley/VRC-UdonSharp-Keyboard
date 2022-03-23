@@ -7,4 +7,8 @@ Feel free to use and give feedback!
 
 ## Requirements
 1) Requires VRChat SDK for Udon Worlds imported.
-2) Then requires [UdonSharp](https://github.com/MerlinVR/UdonSharp) imported.
+2) Then requires [UdonSharp](https://github.com/vrchat-community/UdonSharp) imported.
+
+# License
+MIT Licence
+Please provide credits such that others can find this project.
